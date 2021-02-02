@@ -1,6 +1,7 @@
 "use strict";
 
 const bcrypt = require("bcryptjs");
+const Joi = require("@hapi/joi");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const sengrid = require("@sendgrid/mail");
@@ -24,55 +25,35 @@ async function getUsers(req, res) {
   }
 }
 
-/**
- * DUDAPEDNIENTE
- * async function getUserReviews(req, res) {
-  try {
-    if (!req.auth.role === "admin") {
-      throw new Error("No eres admin");
-    }
-    const idUsuario = req.params.userId;
-
-    const schema = Joi.number().positive();
-    await schema.validateAsync(idUsuario);
-
-    const user = await usersRepository.getUserById(idUsuario);
-    if (!user) {
-      throw new Error("Usuario no existe");
-    }
-    const reviews = await reviewsRepository.getReviewsByUserId(user.id);
-
-    res.send(reviews);
-  } catch (err) {
-    if (err.name === "ValidationError") {
-      err.status = 400;
-    }
-    console.log(err);
-    res.status(err.status || 500);
-    res.send({ error: err.message });
-  }
-}*/
-
 async function register(req, res) {
   try {
     const registerSchema = Joi.object({
       name: Joi.string().required(),
-      lastName: Joi.string().required(),
+      lastname: Joi.string().required(),
       email: Joi.string().email().required(),
       phone: Joi.string().required(),
       foto: Joi.string().required().max(255),
       password: Joi.string().min(4).max(20).required(),
-      repeatPassword: Joi.ref("password"),
+      repeatPassword: Joi.ref("password").required(),
       biografia: Joi.string().required().max(160),
-      role: Joi.string().required(),
+      role: Joi.string().valid("casero", "inquilino").required(),
     });
 
     await registerSchema.validateAsync(req.body);
 
-    const { nombre, email, password } = req.body;
+    const {
+      name,
+      lastname,
+      email,
+      phone,
+      foto,
+      password,
+      biografia,
+      role,
+    } = req.body;
 
     const user = await usersRepository.getUserByEmail(email);
-
+    console.log(name, email, password);
     if (user) {
       const error = new Error("Ya existe un usuario con este email");
       error.status = 409;
@@ -81,20 +62,26 @@ async function register(req, res) {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const id = await usersRepository.createUser(
-      nombre,
       email,
-      passwordHash,
-      "reader"
+      name,
+      lastname,
+      phone,
+      foto,
+      password,
+      biografia,
+      role
     );
-
+    //console.log("hola");
+    console.log(process.env.SENDGRID_KEY);
+    console.log(process.env.SENDGRID_MAIL_FROM);
     // - enviar un mail
     sengrid.setApiKey(process.env.SENDGRID_KEY);
     const data = {
       from: process.env.SENDGRID_MAIL_FROM,
-      to: email,
+      to: `${email}`,
       subject: "Hola!",
-      text: `Hola ${nombre}.\n<strong>Bienvenido al Inquilino Perfecto.\nTu email es ${email}\n`,
-      html: `<h1>Hola ${nombre}.</h1>\n<strong>Bienvenido al Inquilino Perfecto.</strong>\nTu email es ${email}\n`,
+      text: `Hola ${name}.\n<strong>Bienvenido al Inquilino Perfecto.\nTu email es ${email}\n`,
+      html: `<h1>Hola ${name}.</h1>\n<strong>Bienvenido al Inquilino Perfecto.</strong>\nTu email es ${email}\n`,
     };
     await sengrid.send(data);
 
@@ -174,4 +161,10 @@ module.exports = {
   register,
   login,
   getUserInfo,
+  /*  deleteUser,
+  editPassword,
+  editUser,
+  validateUser, */
+  //recuperarPassword((mandar un mail á dirección mail do usuario para rastrear o contrasinal))
+  //resetPassword,(comprobar no req.body as password nova e vella)
 };

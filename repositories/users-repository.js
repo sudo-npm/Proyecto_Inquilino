@@ -37,9 +37,10 @@ async function createUser(
   role
 ) {
   const pool = await database.getPool();
-  const insertQuery =
-    "INSERT INTO users (email, name, lastname, phone, foto,  password, biografia, role) VALUES (?, ?, ?, ?)";
-  const [created] = await pool.query(insertQuery, [
+  console.log(email, name, lastname, phone, foto, password, biografia, role);
+  const insertQuery = `INSERT INTO users (email, name, lastname, phone, foto,  password, biografia, role) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  await pool.query(insertQuery, [
     email,
     name,
     lastname,
@@ -49,8 +50,6 @@ async function createUser(
     biografia,
     role,
   ]);
-
-  return created.insertId;
 }
 
 async function updateUser(

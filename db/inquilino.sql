@@ -112,18 +112,19 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `mydb`.`users` ;
 
-CREATE TABLE IF NOT EXISTS `mydb`.`users` (
+CREATE TABLE IF NOT EXISTS mydb.users (
   `id_user` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_casero` INT UNSIGNED NULL,
   `id_inquilino` INT UNSIGNED NULL,
   `name` VARCHAR(40) NOT NULL,
   `lastName` VARCHAR(40) NOT NULL,
-  `mail` VARCHAR(40) NOT NULL,
+  `email` VARCHAR(40) NOT NULL,
   `phone` VARCHAR(30) NOT NULL,
   `password` VARCHAR(20) NOT NULL,
   `foto` VARCHAR(255) NOT NULL,
   `biografia` VARCHAR(140) NOT NULL,
-  `status` VARCHAR(45) NOT NULL,
+  `role` enum ("inquilino", "casero"),
+  `status` boolean default false NOT NULL,
   PRIMARY KEY (`id_user`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
@@ -145,7 +146,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`caseros` (
   INDEX `fk_valoracion_casero_idx` (`id_valoracion` ASC) VISIBLE,
   INDEX `fk_casero_inmueble_idx` (`id_casa` ASC) VISIBLE,
   CONSTRAINT `fk_usuario_casero`
-    FOREIGN KEY ()
+    FOREIGN KEY (`id_casero`)
     REFERENCES `mydb`.`users` (`id_user`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
@@ -195,8 +196,8 @@ CREATE TABLE IF NOT EXISTS `mydb`.`inquilinos` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_contrato_inquilino`
-    FOREIGN KEY ()
-    REFERENCES `mydb`.`contratos` ()
+    FOREIGN KEY (`id_contrato`)
+    REFERENCES `mydb`.`contratos` (`id_contrato`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_inquilino_alquiler`

@@ -13,8 +13,8 @@ async function getAllAlquileres() {
 async function createAlquiler(
   id_alquiler,
   id_casa,
-  id_casero,
   id_inquilino,
+  id_casero,
   id_contrato
 ) {
   const pool = await database.getPool();
@@ -24,8 +24,8 @@ async function createAlquiler(
   const [created] = await pool.query(insertQuery, [
     { id_alquiler },
     { id_casa },
-    { id_casero },
     { id_inquilino },
+    { id_casero },
     { id_contrato },
   ]);
   return created.insertId;

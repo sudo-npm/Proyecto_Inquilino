@@ -14,7 +14,6 @@ const {
   alquileresController,
   caserosController,
   contratosController,
-  usuariosController,
   valoracionesController,
 } = require("./controllers");
 const validateAuth = require("./middlewares/validate-auth");
@@ -33,18 +32,18 @@ app.get("/inmuebles", inmueblesController.getInmuebles);
 app.get("/alquileres", alquileresController.getAlquileres);
 app.get("/caseros", caserosController.getCaseros);
 app.get("/contratos", contratosController.getContratos);
-app.get("/usuarios", usuariosController.getUsuarios);
+app.get("/users", usersController.getUsers);
 app.get("/valoraciones", valoracionesController.getValoraciones);
-app.post(
+/* app.post(
   "/inmuebles/:inmuebleId/alquilar",
   validateAuth,
   inmueblesController.alquilarInmuebles
-);
-app.post(
+); */
+/* app.post(
   "/inmuebles/:inmuebleId/puntuacion",
   validateAuth,
   inmueblesController.puntuarInmuebles
-);
+); */
 
 // RUTAS ADMIN (AQUI IRÍAN TODAS LAS RUTAS )
 
@@ -55,7 +54,7 @@ app.post(
 app.get("/users", validateAuth, usersController.getUsers);
 app.post("/users/register", usersController.register);
 app.post("/users/login", usersController.login);
-app.get("/users/:userId/reviews", validateAuth, usersController.getUserReviews);
+//app.get("/users/:userId/reviews", validateAuth, usersController.getUserReviews);
 
 // // Books
 // app.get("/books", booksController.getBooks);
@@ -65,12 +64,12 @@ app.get("/users/:userId/reviews", validateAuth, usersController.getUserReviews);
 
 // Inmuebles
 app.get("/inmuebles", inmueblesController.getInmuebles);
-app.post("/inmuebles", validateAuth, inmueblesController.addInmuebles);
-app.get(
+app.post("/inmuebles", validateAuth, inmueblesController.addInmueble);
+/* app.get(
   "/inmuebles/:inmuebleId/puntuacion",
   inmueblesController.getPuntuacionInmuebles
-);
-app.put("/inmuebles", validateAuth, inmueblesController.updateInmuebles);
+); */
+//app.put("/inmuebles", validateAuth, inmueblesController.updateInmuebles);
 
 // // Reviews
 // app.get("/reviews", validateAuth, reviewsController.getReviews);

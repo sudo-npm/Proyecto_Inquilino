@@ -68,4 +68,7 @@ async function addInmueble(req, res) {
 module.exports = {
   getInmuebles,
   addInmueble,
+  /* getInmueble,
+  editInmueble,
+  deleteInmueble, */
 };
