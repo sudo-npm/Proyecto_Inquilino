@@ -1,6 +1,6 @@
-const { getPool } = require("./database");
+const { getConnection } = require("./database");
 const { func } = require("joi");
-const pool = await database.getPool();
+const connection = await database.getConnection();
 require("dotenv").config();
 
 let connection;
@@ -8,18 +8,17 @@ let connection;
 async function main() {
   console.log(`comprobando tablas`);
   try {
-    connection = getPool();
+    connection = getConnection();
     console.log(`borrando tablas`);
     await connection.query("DROP TABLE IF EXISTS `mydb`.`inquilinos`");
     await connection.query("DROP TABLE IF EXISTS `mydb`.`valoraciones`");
     await connection.query("DROP TABLE IF EXISTS `mydb`.`Inmuebles`");
     await connection.query("DROP TABLE IF EXISTS `mydb`.`Alquileres`");
-    await connection.query("DROP TABLE IF EXISTS `mydb`.`contratos`");
     await connection.query("DROP TABLE IF EXISTS `mydb`.`users`");
     await connection.query("DROP TABLE IF EXISTS `mydb`.`caseros`");
     console.log("táboas borradas");
-    /* 
-  CREATE TABLE IF NOT EXISTS `mydb`.`valoraciones` (
+
+    /* CREATE TABLE IF NOT EXISTS `mydb`.`valoraciones` (
     `id_valoracion` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `id_casero` INT UNSIGNED NULL,
     `id_inquilino` INT UNSIGNED NULL,

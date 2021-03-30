@@ -3,9 +3,9 @@
 const database = require("../infrastructure/database");
 
 async function getAllCaseros() {
-  const pool = await database.getPool();
+  const connection = await database.getConnection();
   const query = "SELECT * FROM Caseros";
-  const [caseros] = await pool.query(query);
+  const [caseros] = await connection.query(query);
 
   return caseros;
 }

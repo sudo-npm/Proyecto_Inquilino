@@ -1,17 +1,16 @@
 "use strict";
 
-const usersController = require("./users-controller");
-const inmueblesController = require("./inmuebles-controller");
-const alquileresController = require("./alquileres-controller");
-const caserosController = require("./caseros-controller");
-const contratosController = require("./contratos-controller");
-const valoracionesController = require("./valoraciones-controller");
+const usersController = require("./usersController");
+const inmueblesController = require("./inmueblesController");
+const alquileresController = require("./alquileresController");
+const caserosController = require("./caserosController");
+const valoracionesController = require("./valoracionesController");
 
 module.exports = {
   usersController,
   inmueblesController,
   alquileresController,
   caserosController,
-  contratosController,
   valoracionesController,
+  //passwordController,
 };

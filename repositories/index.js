@@ -1,17 +1,15 @@
 "use strict";
 
-const usersRepository = require("./users-repository");
-const inmueblesRepository = require("./inmuebles-repository");
-const alquileresRepository = require("./alquileres-repository");
-const caserosRepository = require("./caseros-repository");
-const contratosRepository = require("./contratos-repository");
-const valoracionesRepository = require("./valoraciones-repository");
+const usersRepository = require("./usersRepository");
+const inmueblesRepository = require("./inmueblesRepository");
+const alquileresRepository = require("./alquileresRepository");
+const caserosRepository = require("./caserosRepository");
+const valoracionesRepository = require("./valoracionesRepository");
 
 module.exports = {
   usersRepository,
   inmueblesRepository,
   alquileresRepository,
   caserosRepository,
-  contratosRepository,
   valoracionesRepository,
 };

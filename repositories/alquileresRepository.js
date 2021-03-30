@@ -1,11 +1,12 @@
 "use strict";
 
-const database = require("../infrastructure/database");
+// const connection = require("mysql2/typings/mysql/lib/Connection");
+const { getConnection } = require("../infrastructure/database");
 
 async function getAllAlquileres() {
-  const pool = await database.getPool();
+  const connection = await database.getConnection();
   const query = "SELECT * FROM Alquileres";
-  const [alquileres] = await pool.query(query);
+  const [alquileres] = await connection.query(query);
 
   return alquileres;
 }
@@ -17,11 +18,11 @@ async function createAlquiler(
   id_casero,
   id_contrato
 ) {
-  const pool = await database.getPool();
+  const connection = await database.getConnection();
 
   const insertQuery =
     "INSERT INTO Alquileres ($id_alquiler, $id_casa, $id_inquilino, $id_casero, $id_contrato) VALUES (?, ?, ?, ?, ?)";
-  const [created] = await pool.query(insertQuery, [
+  const [created] = await connection.query(insertQuery, [
     { id_alquiler },
     { id_casa },
     { id_inquilino },
@@ -32,9 +33,9 @@ async function createAlquiler(
 }
 
 async function getAlquilerById(id) {
-  const pool = await database.getPool();
+  const connection = await database.getConnection();
   const query = "SELECT * FROM Alquileres WHERE id = ?";
-  const [alquileres] = await pool.query(query, id);
+  const [alquileres] = await connection.query(query, id);
 
   return alquileres[0];
 }

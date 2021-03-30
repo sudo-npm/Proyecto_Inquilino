@@ -11,7 +11,7 @@ async function addValoracion(req, res) {
     }
     const schema = Joi.object({
       valoracion: Joi.string().min(1).max(240).required(),
-      puntuacion: Joi.string().min(1).max(240).required(),
+      puntuacion: Joi.number().min(1).max(3).required(),
     });
   } catch (error) {}
 }
