@@ -1,8 +1,7 @@
 "use strict";
 
-require("dotenv").config();
-
 const mysql = require("mysql2/promise");
+const { normalizePort } = require("../utils");
 
 const {
   DATABASE_HOST,
@@ -14,17 +13,20 @@ const {
 
 let pool;
 
-async function getConnection() {
+async function getPoolConnections() {
   if (!pool) {
     pool = mysql.createPool({
       host: DATABASE_HOST,
-      port: DATABASE_PORT,
+      port: normalizePort(DATABASE_PORT),
       database: DATABASE_NAME,
       user: DATABASE_USER,
       password: DATABASE_PASSWORD,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
     });
   }
-  return await pool.getConnection();
+  return pool;
 }
 
-module.exports = { getConnection };
+module.exports = { getPoolConnections };

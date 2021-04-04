@@ -1,30 +1,50 @@
 "use strict";
 
-const database = require("../infrastructure/database");
+const { getPoolConnections } = require("../infrastructure/database");
 
-async function createValoracion(userId, content, postId) {
-  const pool = await database.getPool();
+async function createValoracion(
+  id_emisor,
+  id_receptor,
+  objeto,
+  puntuacion,
+  valoracion
+) {
+  const pool = await getPoolConnections();
+  const fecha = new Date();
   const insertValoracion =
-    "INSERT INTO `valoracion`(id_usuario, valoracion, puntuacion, postId) VALUES (?, ?, ?)";
-  const [createdValoracion] = await pool.query(insertValoracion, [
-    userId,
-    valoracion,
+    "INSERT INTO valoraciones (id_emisor, id_receptor, objeto, puntuacion, valoracion, fecha) VALUES (?, ?, ?, ?, ?, ?)";
+  await pool.query(insertValoracion, [
+    id_emisor,
+    id_receptor,
+    objeto,
     puntuacion,
-    postId,
+    valoracion,
+    fecha,
   ]);
-
-  return createdValoracion.insertId;
 }
 
-async function getAllValoraciones() {
-  const pool = await database.getPool();
-  const query = "SELECT * FROM Valoraciones";
-  const [valoraciones] = await pool.query(query);
+async function getAllValoracionesByUsuarioAsObjeto(id_receptor, objeto) {
+  const pool = await getPoolConnections();
+  const getValoraciones =
+    "SELECT * FROM valoraciones WHERE id_receptor = ? AND objeto = ?";
+  const [valoraciones] = await pool.query(getValoraciones, [
+    id_receptor,
+    objeto,
+  ]);
+
+  return valoraciones;
+}
+
+async function getAllValoracionesByObjeto(objeto) {
+  const pool = await getPoolConnections();
+  const getValoraciones = "SELECT * FROM valoraciones WHERE objeto = ?";
+  const [valoraciones] = await pool.query(getValoraciones, [objeto]);
 
   return valoraciones;
 }
 
 module.exports = {
   createValoracion,
-  getAllValoraciones,
+  getAllValoracionesByUsuarioAsObjeto,
+  getAllValoracionesByObjeto,
 };

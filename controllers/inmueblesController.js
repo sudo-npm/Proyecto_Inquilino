@@ -1,10 +1,14 @@
 "use strict";
 
-const { inmueblesRepository } = require("../repositories");
+const {
+  inmueblesRepository,
+  fotosRepository,
+  usuariosRepository,
+} = require("../repositories");
 const Joi = require("joi");
+const { sendEmail } = require("../utils");
 
 // Listar todos os inmuebles
-
 async function getInmuebles(req, res) {
   try {
     const inmuebles = await inmueblesRepository.getAllInmuebles();
@@ -19,15 +23,19 @@ async function getInmuebles(req, res) {
   }
 }
 
-/// Listar un inmueble
-
-async function getInmuebleId(req, res) {
+// Listar un inmueble
+async function getInmueble(req, res) {
   try {
-    const inmueble = await inmueblesRepository.getInmuebleById();
-
-    res.send({
-      inmueble: inmueble,
-    });
+    const { id_inmueble } = req.params;
+    const inmueble = await inmueblesRepository.getInmuebleById(id_inmueble);
+    if (inmueble) {
+      const fotos = await fotosRepository.getFotosByInmueble(id_inmueble);
+      inmueble.fotos = fotos.map((foto) => foto.url_foto);
+      res.send(inmueble);
+    } else {
+      res.status(404);
+      res.send({ error: "Inmueble no encontrado" });
+    }
   } catch (err) {
     console.log(err);
     res.status(err.status || 500);
@@ -35,44 +43,52 @@ async function getInmuebleId(req, res) {
   }
 }
 
-async function addInmueble(req, res) {
+async function createInmueble(req, res) {
   try {
-    if (currentEntry.id_user !== req.auth.id) {
-      throw new Error("No eres Usuario");
-    }
-
     const inmuebleSchema = Joi.object({
-      direccion: Joi.string().min(5).max(255).required(),
-      localidad: Joi.string().min(5).max(255).required(),
-      ciudad: Joi.string().min(1).max(255).required(),
-      cp: Joi.string().min(5).max(255).required(),
-      fotos_inmueble: Joi.string().min(1).max(200).required(),
-      habitaciones: Joi.string().min(1).max(20).required(),
-      baños: Joi.string(),
-      cocinas: Joi.string(),
-      salones: Joi.string(),
-      garaje: Joi.string(),
-      trasteros: Joi.string(),
-      precio: Joi.string().required(),
+      superficie: Joi.string(),
+      habitaciones: Joi.number(),
+      baños: Joi.number(),
+      cocinas: Joi.number(),
+      salones: Joi.number(),
+      garajes: Joi.number(),
+      trasteros: Joi.number(),
+      cp: Joi.string(),
+      direccion: Joi.string(),
+      ciudad: Joi.string(),
+      precio: Joi.string(),
+      titulo: Joi.string(),
     });
-
     await inmuebleSchema.validateAsync(req.body);
-
-    const idCreado = await inmueblesRepository.createInmueble(
-      req.auth.id_casero,
-      req.body.direccion,
-      req.body.localidad,
-      req.body.ciudad,
-      req.body.cp,
-      req.body.fotos_inmueble,
+    await inmueblesRepository.createInmueble(
+      req.auth.id_usuario,
+      req.body.superficie,
       req.body.habitaciones,
       req.body.baños,
-      req.body.garaje,
-      req.body.precio
+      req.body.cocinas,
+      req.body.salones,
+      req.body.garajes,
+      req.body.trasteros,
+      req.body.cp,
+      req.body.direccion,
+      req.body.ciudad,
+      req.body.precio,
+      req.body.titulo
     );
-    const inmueble = await inmueblesRepository.getInmuebleById(idCreado);
-
-    res.send(inmueble);
+    const newInmueble = await inmueblesRepository.getInmuebleByTitulo(
+      req.auth.id_usuario,
+      req.body.titulo
+    );
+    if (req.files && req.files.fotos) {
+      Object.keys(req.files.fotos).forEach((key) => {
+        const foto = req.files.fotos[key];
+        const foto_url = `/img/${newInmueble.id_inmueble}_${foto.name}`;
+        fotosRepository.createFoto(newInmueble.id_inmueble, foto_url);
+        foto.mv(`.${foto_url}`);
+      });
+    }
+    res.status(201);
+    res.send(newInmueble);
   } catch (err) {
     console.log(err);
     if (err.name === "ValidationError") {
@@ -83,119 +99,145 @@ async function addInmueble(req, res) {
   }
 }
 
-async function editInmueble(req, res, next) {
-  let connection;
-
+async function editInmueble(req, res) {
   try {
-    connection = await getConnection();
-
-    await editEntrySchema.validateAsync(req.body);
-
-    // Sacamos os datos
-    const {
-      direccion,
-      localidad,
-      ciudad,
-      cp,
-      fotos_inmueble,
-      habitaciones,
-      baños,
-      cocinas,
-      salones,
-      garajes,
-      trasteros,
-      precio,
-    } = req.body;
-
-    const { id } = req.params;
-
-    // Seleccionamos os datos actuais da entrada
-    const [current] = await connection.query(
-      `
-      SELECT direccion, localidad, ciudad, cp, fotos_inmueble, habitaciones, baños, cocinas, salones, garajes, trasteros, precio,
-      lastUpdate
-      FROM Inmuebles WHERE id_casa = ?
-      `,
-      [id]
-    );
-    const [currentEntry] = current;
-
-    if (currentEntry.id_user !== req.auth.id && req.auth.role !== "user") {
-      throw generateError("No tienes persmisos para editar esta entrada", 403);
-    }
-
-    // Executamos a query de edición da entrada
-
-    await connection.query(
-      `
-      UPDATE Inmuebles SET 
-      direccion=?, 
-      localidad=?, 
-      ciudad=?, 
-      cp=?, 
-      fotos_inmueble=?, 
-      habitaciones=?, 
-      baños=?, 
-      cocinas=?, 
-      salones=?, 
-      garajes=?, 
-      trasteros=?, 
-      precio=?
-      
-      WHERE id_casa = ?
-      `,
-      [
-        direccion,
-        localidad,
-        ciudad,
-        cp,
-        fotos_inmueble,
-        habitaciones,
-        baños,
-        cocinas,
-        salones,
-        garajes,
-        trasteros,
-        precio,
-      ]
-    );
-
-    // Devolvemos resultados
-
-    res.send({
-      status: "ok",
-      data: {
-        direccion,
-        localidad,
-        ciudad,
-        cp,
-        fotos_inmueble,
-        habitaciones,
-        baños,
-        cocinas,
-        salones,
-        garajes,
-        trasteros,
-        precio,
-      },
+    const inmuebleSchema = Joi.object({
+      superficie: Joi.string(),
+      habitaciones: Joi.number(),
+      baños: Joi.number(),
+      cocinas: Joi.number(),
+      salones: Joi.number(),
+      garajes: Joi.number(),
+      trasteros: Joi.number(),
+      cp: Joi.string(),
+      direccion: Joi.string(),
+      ciudad: Joi.string(),
+      precio: Joi.string(),
+      titulo: Joi.string(),
     });
-  } catch (error) {
-    next(error);
-  } finally {
-    if (connection) connection.release();
+    await inmuebleSchema.validateAsync(req.body);
+
+    const { id_inmueble } = req.params;
+    await inmueblesRepository.updateInmueble(
+      id_inmueble,
+      req.body.superficie,
+      req.body.habitaciones,
+      req.body.baños,
+      req.body.cocinas,
+      req.body.salones,
+      req.body.garajes,
+      req.body.trasteros,
+      req.body.cp,
+      req.body.direccion,
+      req.body.ciudad,
+      req.body.precio,
+      req.body.titulo
+    );
+
+    const updatedInmueble = await inmueblesRepository.getInmuebleById(
+      id_inmueble
+    );
+    res.status(200);
+    res.send(updatedInmueble);
+  } catch (err) {
+    console.log(err);
+    if (err.name === "ValidationError") {
+      err.status = 400;
+    }
+    res.status(err.status || 500);
+    res.send({ error: err.message });
   }
 }
 
-async function deleteInmueble() {
+async function setOfferInmueble(req, res) {
   try {
-    const { id } = req.params;
-    const id_casa = req.auth.id;
-    const segundoId = Number(id);
-
-    const result = await inmueblesRepository.deleteInmueble(id_casa);
-    if (segundoId !== id_casa) {
-      throw error("Inmueble distinto");
+    const { id_inmueble } = req.params;
+    const { id_usuario } = req.auth;
+    const inmueble = await inmueblesRepository.getInmuebleById(id_inmueble);
+    if (inmueble.estado !== "disponible") {
+      throw {
+        status: 403,
+        message: "No puedes ofertar por un inmueble que no está disponible",
+      };
     }
+    await inmueblesRepository.setOfferInmueble(id_inmueble, id_usuario);
+    const updatedInmueble = await inmueblesRepository.getInmuebleById(
+      id_inmueble
+    );
+    res.status(200);
+    res.send(updatedInmueble);
+  } catch (err) {
+    res.status(err.status || 500);
+    res.send({ error: err.message });
+  }
+}
+
+async function acceptOfferInmueble(req, res) {
+  try {
+    const { id_inmueble } = req.params;
+    const inmueble = await inmueblesRepository.getInmuebleById(id_inmueble);
+    if (inmueble.estado !== "oferta") {
+      throw {
+        status: 403,
+        message:
+          "No puedes aceptar una oferta por un inmueble que no dispone de una",
+      };
+    }
+    const inquilino = await usuariosRepository.getUsuarioById(
+      inmueble.id_inquilino
+    );
+    await sendEmail(
+      inquilino.email,
+      "Oferta aceptada",
+      `¡Enhorabuena! El casero ha aceptado tu oferta de alquiler por el inmueble situado en ${inmueble.direccion} (${inmueble.ciudad})`
+    );
+    await inmueblesRepository.acceptOfferInmueble(id_inmueble);
+    const updatedInmueble = await inmueblesRepository.getInmuebleById(
+      id_inmueble
+    );
+    res.status(200);
+    res.send(updatedInmueble);
+  } catch (err) {
+    res.status(err.status || 500);
+    res.send({ error: err.message });
+  }
+}
+
+async function rejectOfferInmueble(req, res) {
+  try {
+    const { id_inmueble } = req.params;
+    const inmueble = await inmueblesRepository.getInmuebleById(id_inmueble);
+    if (inmueble.estado !== "oferta") {
+      throw {
+        status: 403,
+        message:
+          "No puedes rechazar una oferta por un inmueble que no dispone de una",
+      };
+    }
+    const inquilino = await usuariosRepository.getUsuarioById(
+      inmueble.id_inquilino
+    );
+    await sendEmail(
+      inquilino.email,
+      "Oferta rechazada",
+      `¡Lo sentimos! El casero ha rechazado tu oferta de alquiler por el inmueble situado en ${inmueble.direccion} (${inmueble.ciudad})`
+    );
+    await inmueblesRepository.rejectOfferInmueble(id_inmueble);
+    const updatedInmueble = await inmueblesRepository.getInmuebleById(
+      id_inmueble
+    );
+    res.status(200);
+    res.send(updatedInmueble);
+  } catch (err) {
+    res.status(err.status || 500);
+    res.send({ error: err.message });
+  }
+}
+
+async function deleteInmueble(req, res) {
+  try {
+    const { id_inmueble } = req.params;
+    await inmueblesRepository.deleteInmueble(id_inmueble);
     res.send({ message: "El inmueble ha sido borrado" });
   } catch (err) {
     console.error("No tienes permiso para realizar esta acción");
@@ -204,9 +246,12 @@ async function deleteInmueble() {
 }
 
 module.exports = {
+  createInmueble,
   getInmuebles,
-  getInmuebleId,
-  addInmueble,
+  getInmueble,
   editInmueble,
+  setOfferInmueble,
+  acceptOfferInmueble,
+  rejectOfferInmueble,
   deleteInmueble,
 };

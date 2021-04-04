@@ -5,186 +5,138 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema inquilino_db
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `mydb` ;
+DROP SCHEMA IF EXISTS `inquilino_db` ;
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema inquilino_db
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
-USE `mydb` ;
+CREATE SCHEMA IF NOT EXISTS `inquilino_db` DEFAULT CHARACTER SET utf8 ;
+CREATE USER 'inquilino'@'localhost' IDENTIFIED WITH mysql_native_password BY 'inquilino1234';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, INDEX, DROP, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES ON inquilino_db.* TO 'inquilino'@'localhost';
+USE `inquilino_db` ;
 
 -- -----------------------------------------------------
--- Table `mydb`.`valoraciones`
+-- Table `inquilino_db`.`usuarios`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`valoraciones` ;
+DROP TABLE IF EXISTS `inquilino_db`.`usuarios` ;
 
-CREATE TABLE IF NOT EXISTS `mydb`.`valoraciones` (
-  `id_valoracion` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_casero` INT UNSIGNED NULL,
-  `id_inquilino` INT UNSIGNED NULL,
-  `id_casa` INT UNSIGNED NULL,
-  `valoracion` VARCHAR(240) NOT NULL,
-  `fecha` DATE NOT NULL,
-  `puntuacion` VARCHAR(10) NOT NULL,
-  PRIMARY KEY (`id_valoracion`))
+CREATE TABLE IF NOT EXISTS inquilino_db.usuarios (
+  `id_usuario` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(60) NOT NULL,
+  `apellidos` VARCHAR(120) NOT NULL,
+  `dni` VARCHAR(9) NOT NULL,
+  `email` VARCHAR(60) NOT NULL,
+  `telefono` VARCHAR(9) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `biografia` VARCHAR(255) NOT NULL,
+  `avatar` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id_usuario`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
+-- -----------------------------------------------------
+-- Table `inquilino_db`.`reset`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `inquilino_db`.`reset` ;
+
+CREATE TABLE IF NOT EXISTS inquilino_db.reset (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `token` VARCHAR(255) NOT NULL,
+  `id_usuario` INT UNSIGNED NOT NULL,
+  `valido_hasta` TIMESTAMP NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_usuario_reset`
+    FOREIGN KEY (`id_usuario`)
+    REFERENCES `inquilino_db`.`usuarios` (`id_usuario`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4;
 
 -- -----------------------------------------------------
--- Table `mydb`.`Inmuebles`
+-- Table `inquilino_db`.`inmuebles`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`Inmuebles` ;
+DROP TABLE IF EXISTS `inquilino_db`.`inmuebles` ;
 
-CREATE TABLE IF NOT EXISTS `mydb`.`Inmuebles` (
-  `id_casa` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `inquilino_db`.`inmuebles` (
+  `id_inmueble` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_casero` INT UNSIGNED NOT NULL,
-  `localidad` VARCHAR(40) NOT NULL,
-  `id_contrato` INT UNSIGNED NULL,
-  `fotos` VARCHAR(245) NOT NULL,
+  `id_inquilino` INT UNSIGNED NULL,
   `superficie` VARCHAR(180) NULL,
-  `habitaciones` VARCHAR(20) NOT NULL,
-  `baños` VARCHAR(10) NOT NULL,
-  `cocinas` VARCHAR(5) NOT NULL,
-  `salones` VARCHAR(5) NULL,
+  `habitaciones` TINYINT NOT NULL,
+  `baños` TINYINT NOT NULL,
+  `cocinas` TINYINT NOT NULL,
+  `salones` TINYINT NOT NULL,
   `garajes` TINYINT NOT NULL,
   `trasteros` TINYINT NOT NULL,
-  `cp` VARCHAR(45) NOT NULL,
+  `cp` VARCHAR(5) NOT NULL,
   `direccion` VARCHAR(200) NOT NULL,
   `ciudad` VARCHAR(150) NOT NULL,
   `precio` VARCHAR(150) NOT NULL,
   `titulo` VARCHAR(140) NOT NULL,
-  `id_valoracion` INT UNSIGNED NULL,
-  PRIMARY KEY (`id_casa`),
-  INDEX `fk_valoracion_inmueble_idx` (`id_valoracion` ASC) VISIBLE,
-  CONSTRAINT `fk_valoracion_inmueble`
-    FOREIGN KEY (`id_valoracion`)
-    REFERENCES `mydb`.`valoraciones` (`id_valoracion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Alquileres`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`Alquileres` ;
-
-CREATE TABLE IF NOT EXISTS `mydb`.`Alquileres` (
-  `id_alquiler` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_casa` INT UNSIGNED NULL,
-  `id_inquilino` INT UNSIGNED NULL,
-  `id_casero` INT UNSIGNED NULL,
-  `id_contrato` INT UNSIGNED NULL,
-  `fecha_inicio` DATE NOT NULL,
-  `fecha_fin` DATE NOT NULL,
-  PRIMARY KEY (`id_alquiler`),
-  INDEX `fk_alquiler_casa_idx` (`id_casa` ASC) VISIBLE,
-  CONSTRAINT `fk_alquiler_casa`
-    FOREIGN KEY (`id_casa`)
-    REFERENCES `mydb`.`Inmuebles` (`id_casa`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
-
--- -----------------------------------------------------
--- Table `mydb`.`users`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`users` ;
-
-CREATE TABLE IF NOT EXISTS mydb.users (
-  `id_user` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_casero` INT UNSIGNED NULL,
-  `id_inquilino` INT UNSIGNED NULL,
-  `name` VARCHAR(40) NOT NULL,
-  `lastName` VARCHAR(80) NOT NULL,
-  `dni` VARCHAR(20) NOT NULL,
-  `email` VARCHAR(40) NOT NULL,
-  `phone` VARCHAR(30) NOT NULL,
-  `password` VARCHAR(200) NOT NULL,
-  `foto_user` VARCHAR(255) NOT NULL,
-  `biografia` VARCHAR(140) NOT NULL,
-  `role` enum ("inquilino", "casero"),
-  `status` boolean default false NOT NULL,
-  PRIMARY KEY (`id_user`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`caseros`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`caseros` ;
-
-CREATE TABLE IF NOT EXISTS `mydb`.`caseros` (
-  `id_casero` INT UNSIGNED NOT NULL,
-  `id_casa` INT UNSIGNED NULL,
-  `id_alquiler` INT UNSIGNED NULL,
-  `id_valoracion` INT UNSIGNED NULL,
-  PRIMARY KEY (`id_casero`),
-  INDEX `fk_casero_alquiler_idx` (`id_alquiler` ASC) VISIBLE,
-  INDEX `fk_valoracion_casero_idx` (`id_valoracion` ASC) VISIBLE,
-  INDEX `fk_casero_inmueble_idx` (`id_casa` ASC) VISIBLE,
+  `estado` ENUM("disponible", "oferta", "alquilado"),
+  PRIMARY KEY (`id_inmueble`),
+  UNIQUE KEY `id_titulo_casero` (`id_casero`,`titulo`),
   CONSTRAINT `fk_usuario_casero`
     FOREIGN KEY (`id_casero`)
-    REFERENCES `mydb`.`users` (`id_user`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_casero_alquiler`
-    FOREIGN KEY (`id_alquiler`)
-    REFERENCES `mydb`.`alquileres` (`id_alquiler`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_valoracion_casero`
-    FOREIGN KEY (`id_valoracion`)
-    REFERENCES `mydb`.`valoraciones` (`id_valoracion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_casero_inmueble`
-    FOREIGN KEY (`id_casa`)
-    REFERENCES `mydb`.`Inmuebles` (`id_casa`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES `inquilino_db`.`usuarios` (`id_usuario`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_usuario_inquilino`
+    FOREIGN KEY (`id_inquilino`)
+    REFERENCES `inquilino_db`.`usuarios` (`id_usuario`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
-
 -- -----------------------------------------------------
--- Table `mydb`.`inquilinos`
+-- Table `inquilino_db`.`fotos`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`inquilinos` ;
+DROP TABLE IF EXISTS `inquilino_db`.`fotos` ;
 
-CREATE TABLE IF NOT EXISTS `mydb`.`inquilinos` (
-  `id_inquilino` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_alquiler` INT UNSIGNED NULL,
-  `id_casa` INT UNSIGNED NULL,
-  `id_user` INT UNSIGNED NULL,
-  `id_valoracion` INT UNSIGNED NULL,
-  PRIMARY KEY (`id_inquilino`),
-  INDEX `fk_valoracion_inquilino_idx` (`id_valoracion` ASC) VISIBLE,
-  INDEX `fk_inquilino_alquiler_idx` (`id_alquiler` ASC) VISIBLE,
-  CONSTRAINT `fk_user_inquilino`
-    FOREIGN KEY (`id_contrato`)
-    REFERENCES `mydb`.`users` (`id_user`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_valoracion_inquilino`
-    FOREIGN KEY (`id_valoracion`)
-    REFERENCES `mydb`.`valoracion` (`id_valoracion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_inquilino_alquiler`
-    FOREIGN KEY (`id_alquiler`)
-    REFERENCES `mydb`.`Alquileres` (`id_alquiler`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+CREATE TABLE IF NOT EXISTS `inquilino_db`.`fotos` (
+  `id_foto` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_inmueble` INT UNSIGNED NOT NULL,
+  `url_foto` VARCHAR(245) NOT NULL,
+  PRIMARY KEY (`id_foto`),
+  CONSTRAINT `fk_inmueble_foto`
+    FOREIGN KEY (`id_inmueble`)
+    REFERENCES `inquilino_db`.`inmuebles` (`id_inmueble`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
+-- -----------------------------------------------------
+-- Table `inquilino_db`.`valoraciones`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `inquilino_db`.`valoraciones` ;
+
+CREATE TABLE IF NOT EXISTS `inquilino_db`.`valoraciones` (
+  `id_valoracion` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_emisor` INT UNSIGNED NOT NULL,
+  `id_receptor` INT UNSIGNED NOT NULL,
+  `objeto` ENUM("casero", "inquilino"),
+  `puntuacion` TINYINT NOT NULL,
+  `valoracion` VARCHAR(240) NOT NULL,
+  `fecha` DATETIME NOT NULL,
+  PRIMARY KEY (`id_valoracion`),
+  CONSTRAINT `fk_emisor_valoracion`
+    FOREIGN KEY (`id_emisor`)
+    REFERENCES `inquilino_db`.`usuarios` (`id_usuario`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_receptor_valoracion`
+    FOREIGN KEY (`id_receptor`)
+    REFERENCES `inquilino_db`.`usuarios` (`id_usuario`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

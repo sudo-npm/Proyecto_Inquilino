@@ -1,84 +1,47 @@
-"use strict";
+const app = require("./app");
+const http = require("http");
+const { normalizePort } = require("./utils");
 
-require("dotenv").config();
-
-const express = require("express");
-const fileUpload = require("express-fileupload");
-const bodyParser = require("body-parser");
-//const morgan = require("morgan");
-
-// Controller,
-const {
-  usersController,
-  inmueblesController,
-  alquileresController,
-  caserosController,
-  valoracionesController,
-} = require("./controllers");
-const validateAuth = require("./middlewares/validateAuth");
-
-//variables
-const { SERVER_PORT } = process.env;
-
-//Declaramos app
-const app = express();
-
-//Middlewares
-app.use(bodyParser.json());
-
-// Body parser (multipart from data <- subida de imágenes)
-app.use(fileUpload());
-
-// Rutas
-app.get("/inmuebles", inmueblesController.getInmuebles);
-app.get("/alquileres", alquileresController.getAlquileres);
-app.get("/caseros", caserosController.getCaseros);
-app.get("/inquilinos", caserosController.getInquilinos);
-/* app.get("/contratos", contratosController.getContratos);
+/**
+ * Event listener for HTTP server "error" event.
  */
-app.get("/users", usersController.getUsers);
-app.get("/valoraciones", valoracionesController.getValoraciones);
-/* app.post(
-  "/inmuebles/:inmuebleId/alquilar",
-  validateAuth,
-  inmueblesController.alquilarInmuebles
-); */
-/* app.post(
-  "/inmuebles/:inmuebleId/puntuacion",
-  validateAuth,
-  inmueblesController.puntuarInmuebles
-); */
+function onError(error) {
+  if (error.syscall !== "listen") {
+    throw error;
+  }
+  const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
+      process.exit(1);
+      break;
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
 
-// RUTAS ADMIN (AQUI IRÍAN TODAS LAS RUTAS )
+/**
+ * Event listener for HTTP server "listening" event.
+ */
 
-// Configuración de las rutas
+function onListening() {
+  const addr = server.address();
+  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  console.log("Server listening on " + bind);
+}
 
-// Users
-app.get("/users/:id_user", usersController.getUserInfo);
+// Get port from environment and store in Express.
+const port = normalizePort(process.env.SERVER_PORT || "3000");
+app.set("port", port);
 
-app.get("/users", validateAuth, usersController.getUsers);
-app.post("/users/register", usersController.register);
-app.post("/users/login", usersController.login);
-app.post("/users/editPassword", validateAuth, usersController.editPassword);
-app.post("/users/editUser", validateAuth, usersController.editUser);
-app.delete("/users/:id", validateAuth, usersController.deleteUser);
-//app.get("/users/:userId/reviews", validateAuth, usersController.getUserReviews);
+// Create HTTP server.
+const server = http.createServer(app);
 
-// Inmuebles
-app.get("/inmuebles", inmueblesController.getInmuebles);
-app.get("/inmuebles", inmueblesController.getInmuebleId);
-app.post("/inmuebles", validateAuth, inmueblesController.addInmueble);
-app.post("/inmuebles", validateAuth, inmueblesController.editInmueble);
-//app.get("/inmuebles/:id_casa/valoracion", inmueblesController.getValoracion);
-/* app.put(
-  "/inmuebles/:id_casa",
-  validateAuth,
-  inmueblesController.updateInmuebles
-); */
-/* app.get(
-  "/inmuebles/:inmuebleId/puntuacion",
-  inmueblesController.getPuntuacionInmuebles
-); */
-//app.put("/inmuebles", validateAuth, inmueblesController.updateInmuebles);
-
-app.listen(SERVER_PORT, () => console.log(`Escuchando ${SERVER_PORT}`));
+server.listen(port);
+server.on("error", onError);
+server.on("listening", onListening);

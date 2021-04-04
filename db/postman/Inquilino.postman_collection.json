@@ -1,0 +1,693 @@
+{
+	"info": {
+		"_postman_id": "02d3e5b3-d967-4b20-9a61-cafb92f06837",
+		"name": "Inquilino",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Usuario",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "nombre",
+							"value": "Pepe",
+							"type": "text"
+						},
+						{
+							"key": "apellidos",
+							"value": "Bolete",
+							"type": "text"
+						},
+						{
+							"key": "dni",
+							"value": "24357586M",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "pepe@mail.com",
+							"type": "text"
+						},
+						{
+							"key": "telefono",
+							"value": "654321234",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Pepe1234",
+							"type": "text"
+						},
+						{
+							"key": "repeatPassword",
+							"value": "Pepe1234",
+							"type": "text"
+						},
+						{
+							"key": "biografia",
+							"value": "Soy Pepe y me gusta el solete.",
+							"type": "text"
+						},
+						{
+							"key": "avatar",
+							"type": "file",
+							"src": "/home/pedro/HackABoss/Proxecto-Inquilino/BACKEND/img/avatar1.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuarios/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuarios",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logging Usuario",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"pepe@mail.com\",\n    \"password\": \"Pepe1234\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuarios/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuarios",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Usuarios",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					},
+					{
+						"key": "1",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJub21icmUiOiJQZXBlIiwiaWF0IjoxNjE3NDcwMDY3LCJleHAiOjE2MjAwNjIwNjd9.8UR-3McKJLMgenNNtoYWp4-r0IBJdPIKrv3zBaQqSSc",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/usuarios",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Usuario Info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoxLCJub21icmUiOiJQZXBlIiwiaWF0IjoxNjE3NDcwMDY3LCJleHAiOjE2MjAwNjIwNjd9.8UR-3McKJLMgenNNtoYWp4-r0IBJdPIKrv3zBaQqSSc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuarios/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuarios",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Reset Password Token",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/usuarios/reset-password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuarios",
+						"reset-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reset password",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"Manolo666\",\n    \"repeatPassword\": \"Manolo666\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/usuarios/reset-password/9859ed2d7c6d9684dd146f2dccf7887d2744cb36a2c88eceffbeb6ec5ffd95b4/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuarios",
+						"reset-password",
+						"9859ed2d7c6d9684dd146f2dccf7887d2744cb36a2c88eceffbeb6ec5ffd95b4",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Usuario",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/usuarios",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Inmueble",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "superficie",
+							"value": "74m2",
+							"type": "text"
+						},
+						{
+							"key": "habitaciones",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "baños",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "cocinas",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "salones",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "garajes",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "trasteros",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "cp",
+							"value": "15001",
+							"type": "text"
+						},
+						{
+							"key": "direccion",
+							"value": "Avenida de la Marina, 23, 1º derecha",
+							"type": "text"
+						},
+						{
+							"key": "ciudad",
+							"value": "Coruña",
+							"type": "text"
+						},
+						{
+							"key": "precio",
+							"value": "580€",
+							"type": "text"
+						},
+						{
+							"key": "titulo",
+							"value": "Piso en La Marina",
+							"type": "text"
+						},
+						{
+							"key": "fotos",
+							"type": "file",
+							"src": [
+								"/home/pedro/HackABoss/Proxecto-Inquilino/BACKEND/img/habita1.jpg",
+								"/home/pedro/HackABoss/Proxecto-Inquilino/BACKEND/img/piso1.jpg"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/inmuebles",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"inmuebles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Inmuebles",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/inmuebles",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"inmuebles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Inmueble",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/inmuebles/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"inmuebles",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Inmueble",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"superficie\": \"118m2\",\n    \"habitaciones\": 3,\n    \"baños\": 2,\n    \"cocinas\": 1,\n    \"salones\": 1,\n    \"garajes\": 1,\n    \"trasteros\": 1,\n    \"cp\": \"08013\",\n    \"direccion\": \"Avenida de la Marina, 23, 1º derecha\",\n    \"ciudad\": \"Coruña\",\n    \"precio\": \"640€\",\n    \"titulo\": \"Piso de primera en la Marina\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/inmuebles/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"inmuebles",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Inmueble",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/inmuebles/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"inmuebles",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set Offer Inmueble",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/inmuebles/1/offer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"inmuebles",
+						"1",
+						"offer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Accept Offer Inmueble",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/inmuebles/1/accept",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"inmuebles",
+						"1",
+						"accept"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reject Offer Inmueble",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/inmuebles/1/reject",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"inmuebles",
+						"1",
+						"reject"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Valoración",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id_receptor\": 1,\n    \"objeto\": \"casero\",\n    \"puntuacion\": 4,\n    \"valoracion\": \"Le pongo un 4 por el exelente trato\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/valoraciones",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"valoraciones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Puntuaciones",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/valoraciones/casero",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"valoraciones",
+						"casero"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Valoraciones Usuario",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Auth_Token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/valoraciones/casero/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"valoraciones",
+						"casero",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

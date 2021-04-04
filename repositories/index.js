@@ -1,15 +1,15 @@
 "use strict";
 
-const usersRepository = require("./usersRepository");
+const usuariosRepository = require("./usuariosRepository");
+const resetRepository = require("./resetRepository");
 const inmueblesRepository = require("./inmueblesRepository");
-const alquileresRepository = require("./alquileresRepository");
-const caserosRepository = require("./caserosRepository");
+const fotosRepository = require("./fotosRepository");
 const valoracionesRepository = require("./valoracionesRepository");
 
 module.exports = {
-  usersRepository,
+  usuariosRepository,
+  resetRepository,
   inmueblesRepository,
-  alquileresRepository,
-  caserosRepository,
+  fotosRepository,
   valoracionesRepository,
 };
