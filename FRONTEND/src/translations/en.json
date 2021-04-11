@@ -1,0 +1,4 @@
+{
+  "app.greeting": "Hello {name}",
+  "foo": "To buy a shoe, <a>visit our website</a> and <cta>buy a shoe</cta>"
+}
